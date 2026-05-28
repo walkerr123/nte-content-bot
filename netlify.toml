@@ -1,5 +1,6 @@
 [build]
   functions = "netlify/functions"
+  publish = "."     # This tells Netlify to publish the root folder
 
 [functions."nte-bot"]
   schedule = "*/30 * * * *"
