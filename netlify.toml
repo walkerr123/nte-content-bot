@@ -2,16 +2,11 @@
   publish = "public"
   functions = "netlify/functions"
 
+# This forces Netlify to bundle Python dependencies
 [functions]
-  node_bundler = "esbuild"
-
-# Redirect /api/* to Netlify functions so frontend calls stay clean
-[[redirects]]
-  from = "/api/content"
-  to   = "/.netlify/functions/content"
-  status = 200
+  node_bundler = "none"
 
 [[redirects]]
-  from = "/api/health"
-  to   = "/.netlify/functions/health"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
