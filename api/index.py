@@ -3,12 +3,11 @@ from datetime import datetime, timedelta
 import os
 from telebot import TeleBot
 
-# Load from environment variables (safe)
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 if not TOKEN or not CHAT_ID:
-    raise ValueError("Missing TELEGRAM_TOKEN or CHAT_ID in environment variables!")
+    raise ValueError("TELEGRAM_TOKEN or CHAT_ID not set in Vercel Environment Variables!")
 
 BOT = TeleBot(TOKEN)
 
@@ -39,13 +38,13 @@ def handler(request):
         if not posts:
             return {"statusCode": 200, "body": "No new important NTE updates."}
         
-        msg = "🚨 **NEW NTE INFO DETECTED** 🚨\n\n"
+        msg = " **NEW NTE INFO DETECTED** \n\n"
         for post in posts[:3]:
             msg += f"**{post.title}**\n🔗 {post.link}\n\n"
-            msg += "**Content Ideas:**\n"
-            msg += "• Short Video: Strong hook + key points\n"
-            msg += "• Main Guide: Intro → Pull Priority → Farming → Teams → Pro Tips\n"
-            msg += "• Thumbnail: \"NEW PATCH JUST DROPPED 💀\"\n"
+            msg += "**Content Plan:**\n"
+            msg += "• Short: Hook + key changes\n"
+            msg += "• Main Guide: Intro → Pull Priority → Farming → Teams → Tips\n"
+            msg += "• Thumbnail: \"NEW PATCH DROPPED 💀\"\n"
             msg += "═"*35 + "\n\n"
         
         BOT.send_message(CHAT_ID, msg[:3500])
