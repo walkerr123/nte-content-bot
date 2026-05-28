@@ -1,6 +1,17 @@
 [build]
+  publish = "public"
   functions = "netlify/functions"
-  publish = "."     # This tells Netlify to publish the root folder
 
-[functions."nte-bot"]
-  schedule = "*/30 * * * *"
+[functions]
+  node_bundler = "esbuild"
+
+# Redirect /api/* to Netlify functions so frontend calls stay clean
+[[redirects]]
+  from = "/api/content"
+  to   = "/.netlify/functions/content"
+  status = 200
+
+[[redirects]]
+  from = "/api/health"
+  to   = "/.netlify/functions/health"
+  status = 200
