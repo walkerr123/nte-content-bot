@@ -73,10 +73,13 @@ async function fetchRedditPosts(rssUrl, fetchLimit = 25) {
         return m ? m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim() : "";
       };
       const linkMatch = entry.match(/<link[^>]+href="([^"]+)"/);
-      const content = get("content")
+      const rawContent = get("content");
+      const decoded = rawContent
+        .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#\d+;/g, " ");
+      const content = decoded
         .replace(/<[^>]+>/g, " ")
-        .replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&lt;/g, "").replace(/&gt;/g, "").replace(/&#\d+;/g, "")
-        .replace(/\s+/g, " ").trim().slice(0, 600);
+        .replace(/&[a-z]+;/g, " ")
+        .replace(/\s+/g, " ").trim().slice(0, 300);
       posts.push({
         title: get("title") || "No title",
         link: linkMatch ? linkMatch[1] : "#",
