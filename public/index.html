@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NTE Studio — Guide Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #09090f; --bg-card: #111119; --bg-input: #0e0e17; --bg-hover: #161620;
+      --purple: #7c3aed; --purple-dim: rgba(124,58,237,0.18); --purple-glow: rgba(124,58,237,0.08);
+      --border: rgba(124,58,237,0.16); --border-mid: rgba(124,58,237,0.28);
+      --text-primary: #eae6ff; --text-secondary: #8b84aa; --text-muted: #4d4866;
+      --mono: 'JetBrains Mono', monospace; --sans: 'Syne', sans-serif;
+      --green: #34d399; --yellow: #fbbf24; --red: #f87171;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; height: 56px;
+      background: rgba(9,9,15,0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+    .logo-mark { width: 32px; height: 32px; background: var(--purple); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-mark svg { width: 16px; height: 16px; fill: #fff; }
+    .logo-name { font-size: 15px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.4px; }
+    .logo-tag { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-left: 2px; }
+    .nav-stats { display: flex; align-items: center; gap: 20px; }
+    .nav-stat { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+    .nav-stat b { font-weight: 500; color: #c4b5fd; }
+    .nav-divider { width: 1px; height: 14px; background: var(--border); }
+    .btn-refresh {
+      display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+      border-radius: 8px; border: 1px solid var(--border-mid); background: var(--bg-input);
+      color: #c4b5fd; font-family: var(--sans); font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-refresh:hover { background: var(--bg-hover); border-color: var(--purple); }
+    .btn-refresh svg { width: 13px; height: 13px; stroke: currentColor; fill: none; }
+    .btn-refresh.spinning svg { animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .page { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 36px 32px 80px; }
+    .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+    .platform-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+    .platform-btn {
+      display: flex; align-items: center; gap: 8px; padding: 10px 20px;
+      border-radius: 999px; border: 1px solid var(--border); background: var(--bg-card);
+      color: var(--text-secondary); font-family: var(--sans); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .platform-btn:hover:not([disabled]) { border-color: var(--border-mid); color: #c4b5fd; background: var(--bg-hover); }
+    .platform-btn.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+    .platform-btn[disabled] { opacity: 0.35; cursor: not-allowed; }
+    .platform-btn svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+    .soon-badge { font-family: var(--mono); font-size: 9px; background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.35); padding: 1px 5px; border-radius: 4px; margin-left: 2px; }
+    .feed-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .feed-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .feed-count { font-family: var(--mono); font-size: 11px; background: var(--purple-dim); color: #c4b5fd; padding: 2px 9px; border-radius: 999px; border: 1px solid rgba(124,58,237,0.25); }
+    .feed-right { font-family: var(--mono); font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .skeleton { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px; }
+    .skel-line { background: linear-gradient(90deg,#1a1a28 25%,#1f1f30 50%,#1a1a28 75%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: 5px; height: 11px; margin-bottom: 10px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px 18px; margin-bottom: 14px; animation: fadeUp 0.38s ease both; transition: border-color 0.2s; }
+    .card:hover { border-color: var(--border-mid); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .card-badges { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .badge { font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .b-done   { background: rgba(52,211,153,0.12); color: var(--green);  border: 1px solid rgba(52,211,153,0.25); }
+    .b-type   { background: var(--purple-dim); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.28); }
+    .b-date   { color: var(--text-muted); font-size: 10px; font-family: var(--mono); }
+    .b-urg-h  { background: rgba(248,113,113,0.1); color: var(--red);    border: 1px solid rgba(248,113,113,0.22); animation: urgp 2s ease-in-out infinite; }
+    .b-urg-m  { background: rgba(251,191,36,0.1);  color: var(--yellow); border: 1px solid rgba(251,191,36,0.22); }
+    .b-urg-l  { background: rgba(52,211,153,0.1);  color: var(--green);  border: 1px solid rgba(52,211,153,0.22); }
+    @keyframes urgp { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .card-meta { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-align: right; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+    .card-title { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.3; margin-bottom: 16px; letter-spacing: -0.3px; }
+    .card-title a { color: inherit; text-decoration: none; transition: color 0.15s; }
+    .card-title a:hover { color: #c4b5fd; }
+    .card-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+    .tab-btn { font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--text-muted); padding: 7px 16px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; transition: all 0.15s; }
+    .tab-btn:hover { color: #c4b5fd; }
+    .tab-btn.active { color: #c4b5fd; border-bottom-color: var(--purple); }
+    .tab-model { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--text-muted); align-self: center; padding-right: 2px; }
+    .pane { display: none; }
+    .pane.active { display: block; }
+    .hook-line { font-family: var(--mono); font-size: 12px; color: #c4b5fd; background: rgba(124,58,237,0.08); border-left: 2px solid var(--purple); padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 14px; line-height: 1.6; }
+    .summary-box { display: flex; gap: 12px; align-items: flex-start; background: rgba(124,58,237,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .summary-box svg { width: 16px; height: 16px; stroke: #c4b5fd; fill: none; flex-shrink: 0; margin-top: 2px; }
+    .summary-box p { font-size: 13px; color: #a09abf; line-height: 1.7; }
+    .plan-block { margin-bottom: 18px; }
+    .plan-block:last-child { margin-bottom: 0; }
+    .plan-label { font-family: var(--mono); font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 9px; display: flex; align-items: center; gap: 6px; }
+    .plan-label svg { width: 12px; height: 12px; stroke: var(--purple); fill: none; }
+    .yt-title { font-family: var(--mono); font-size: 11px; color: #c4b5fd; background: rgba(124,58,237,0.08); border-radius: 7px; padding: 7px 11px; margin-bottom: 9px; line-height: 1.5; }
+    .step-list { list-style: none; }
+    .step-list li { display: flex; gap: 11px; align-items: flex-start; font-size: 12px; color: #a09abf; padding: 6px 0; border-bottom: 1px solid rgba(124,58,237,0.07); line-height: 1.5; }
+    .step-list li:last-child { border-bottom: none; }
+    .step-n { font-family: var(--mono); font-size: 10px; color: var(--purple); font-weight: 500; min-width: 14px; margin-top: 1px; }
+    .urg-note { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; }
+    .thumb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .thumb-card { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; padding: 12px; position: relative; overflow: hidden; transition: border-color 0.15s; cursor: default; }
+    .thumb-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 110%, rgba(124,58,237,0.1) 0%, transparent 65%); }
+    .thumb-card:hover { border-color: var(--border-mid); }
+    .thumb-card p { position: relative; font-size: 11px; font-weight: 700; color: var(--text-primary); text-align: center; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; }
+    .hashtag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .hashtag { font-family: var(--mono); font-size: 10px; color: #7c5cdb; background: rgba(124,58,237,0.08); padding: 3px 9px; border-radius: 999px; border: 1px solid rgba(124,58,237,0.15); cursor: pointer; transition: all 0.15s; }
+    .hashtag:hover { background: rgba(124,58,237,0.18); color: #c4b5fd; }
+    .empty { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+    .empty svg { width: 36px; height: 36px; stroke: var(--text-muted); fill: none; margin: 0 auto 14px; display: block; }
+    .empty p { font-size: 13px; line-height: 1.7; }
+    .empty b { color: var(--text-secondary); font-weight: 500; }
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e1e2e; border: 1px solid var(--border-mid); border-radius: 10px; padding: 11px 20px; font-size: 13px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; opacity: 0; pointer-events: none; transition: all 0.25s; z-index: 200; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast svg { width: 14px; height: 14px; stroke: var(--green); fill: none; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M8 1l2 4 4.5.7-3.25 3.17.77 4.47L8 11.25l-4.02 2.09.77-4.47L1.5 5.7 6 5z"/></svg>
+    </div>
+    <span class="logo-name">NTE Studio</span>
+    <span class="logo-tag">guide intelligence</span>
+  </div>
+  <div class="nav-stats">
+    <div class="nav-stat"><b id="s-total">0</b> total</div>
+    <div class="nav-divider"></div>
+    <div class="nav-stat"><b id="s-done">0</b> done</div>
+    <div class="nav-divider"></div>
+    <div class="nav-stat"><b id="s-queue">0</b> queue</div>
+  </div>
+  <button class="btn-refresh" id="btn-refresh" onclick="refresh()">
+    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+    Refresh
+  </button>
+</nav>
+
+<div class="page">
+  <div class="eyebrow">Choose a source</div>
+  <div class="platform-row">
+    <button class="platform-btn active" data-platform="reddit" onclick="pickPlatform(this)">
+      <svg viewBox="0 0 20 20"><path d="M10 0C4.478 0 0 4.478 0 10s4.478 10 10 10 10-4.478 10-10S15.522 0 10 0zm5.926 10.26c.04.19.06.387.06.585 0 2.996-3.589 5.427-8.012 5.427-4.42 0-8.009-2.43-8.009-5.427 0-.197.02-.394.059-.584a1.54 1.54 0 01-.626-1.254 1.545 1.545 0 012.721-1.001c1.332-.937 3.172-1.537 5.206-1.598l.99-4.6.058.013 3.18.68a1.069 1.069 0 102.013.495 1.07 1.07 0 00-1.07-1.069 1.07 1.07 0 00-.997.692l-2.836-.607-.888 4.112c2.02.07 3.847.67 5.172 1.603a1.545 1.545 0 012.718 1.003c0 .497-.235.938-.599 1.223l.06.507zM7.077 11.12a1.07 1.07 0 100-2.138 1.07 1.07 0 000 2.138zm5.539.74c-.68.681-2.023.734-2.412.734-.389 0-1.734-.053-2.413-.734a.267.267 0 00-.378.378c.87.87 2.395.945 2.791.945.396 0 1.922-.075 2.791-.945a.267.267 0 00-.379-.378zm-.462-2.877a1.07 1.07 0 100 2.139 1.07 1.07 0 000-2.139z"/></svg>
+      Reddit
+    </button>
+    <button class="platform-btn" disabled>
+      <svg viewBox="0 0 20 20"><path d="M11.997 8.56L18.52 1h-1.554l-5.672 6.29L6.75 1H1.5l6.845 9.52L1.5 18.5h1.554l5.984-6.637L14.25 18.5H19.5l-7.503-9.94zm-2.118 2.35l-.694-.947-5.517-7.52h2.376l4.455 6.074.693.947 5.788 7.892h-2.376l-4.725-6.446z"/></svg>
+      Twitter / X <span class="soon-badge">soon</span>
+    </button>
+    <button class="platform-btn" disabled>
+      <svg viewBox="0 0 20 20"><path d="M16.93 4.28A16.18 16.18 0 0013.13 3a.06.06 0 00-.07.03c-.17.3-.35.68-.48.98a14.93 14.93 0 00-4.16 0 9.52 9.52 0 00-.49-.98.06.06 0 00-.06-.03 16.13 16.13 0 00-3.8 1.28.06.06 0 00-.03.02C1.6 7.68 1.08 11 1.34 14.28a.07.07 0 00.03.05 16.28 16.28 0 004.72 2.3.07.07 0 00.07-.02c.36-.48.68-.98.96-1.51a.06.06 0 00-.04-.09 10.72 10.72 0 01-1.48-.68.06.06 0 010-.1c.1-.07.2-.14.3-.22a.06.06 0 01.06 0c3.1 1.37 6.46 1.37 9.52 0a.06.06 0 01.06.01c.1.07.2.15.3.21a.06.06 0 010 .1 9.72 9.72 0 01-1.49.68.06.06 0 00-.03.09c.28.53.6 1.03.95 1.51a.06.06 0 00.07.02 16.22 16.22 0 004.73-2.3.07.07 0 00.03-.05c.3-3.73-.5-6.98-2.1-9.98a.05.05 0 00-.03-.02zM7.17 12.38c-.9 0-1.63-.8-1.63-1.77 0-.98.72-1.77 1.63-1.77.92 0 1.64.8 1.63 1.77 0 .98-.72 1.77-1.63 1.77zm6.02 0c-.9 0-1.63-.8-1.63-1.77 0-.98.72-1.77 1.63-1.77.92 0 1.64.8 1.63 1.77 0 .98-.71 1.77-1.63 1.77z"/></svg>
+      Discord <span class="soon-badge">soon</span>
+    </button>
+    <button class="platform-btn" disabled>
+      <svg viewBox="0 0 20 20"><path d="M19.58 5.26a2.49 2.49 0 00-1.75-1.75C16.25 3.1 10 3.1 10 3.1s-6.25 0-7.83.41A2.49 2.49 0 00.42 5.26 26.08 26.08 0 000 10a26.08 26.08 0 00.42 4.74 2.49 2.49 0 001.75 1.75C3.75 16.9 10 16.9 10 16.9s6.25 0 7.83-.41a2.49 2.49 0 001.75-1.75A26.08 26.08 0 0020 10a26.08 26.08 0 00-.42-4.74zM8 13V7l5.2 3L8 13z"/></svg>
+      YouTube <span class="soon-badge">soon</span>
+    </button>
+  </div>
+
+  <div class="feed-header">
+    <div class="feed-title">
+      Guide Feed
+      <span class="feed-count" id="feed-count">0</span>
+    </div>
+    <div class="feed-right">
+      <span class="live-dot"></span>
+      <span id="feed-meta">loading...</span>
+    </div>
+  </div>
+
+  <div id="feed"></div>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+  <span id="toast-msg">Copied!</span>
+</div>
+
+<script>
+const MOCK = [
+  { post: { title: "Best F2P team builds after 1.1 patch — full tier breakdown", link: "#", summary: "After the 1.1 patch the meta shifted significantly. Daffodil now works as a solid off-field DPS and several older teams got indirect buffs through the anomaly rework. Full breakdown for players not spending — covering S-tier, A-tier, and budget picks with rotation notes.", published: "2026-05-29T08:30:00Z", source_name: "r/NevernessToEverness" }, plan: { hook: "F2P players just got a massive buff from the 1.1 patch changes", content_type: "Tier List", short_form: { platform: "TikTok / YouTube Shorts", duration: "45s", script_outline: ["Hook — 'the F2P meta just changed'", "Flash the S-tier free teams on screen", "Quick rotation demo for the best team", "CTA — comment your current team below"] }, long_form: { title: "Best F2P Teams After NTE 1.1 — Every Budget Build Ranked", duration: "10-14 mins", sections: ["Intro — what changed in 1.1 for free players", "S-tier free teams full breakdown", "Team rotations and skill priority order", "Mistakes new players make with these teams", "Outro + subscribe for weekly NTE guides"] }, thumbnail_texts: ["F2P TEAMS ARE BROKEN NOW 🔥", "1.1 PATCH CHANGED THE META", "FREE TIER LIST 2026"], hashtags: ["#NTE", "#NevernessToEverness", "#NTEguide", "#gachagaming", "#F2P"], urgency: "high", urgency_reason: "Patch just dropped — publish now to capture peak search traffic before bigger channels do." }, generated_at: "2026-05-29T09:00:00Z" },
+  { post: { title: "City Tycoon max passive income — best business combos each reset", link: "#", summary: "After testing every business combination in the City Tycoon system I found the optimal setup for passive Pixel income each daily reset. Cafe + Auto Shop is the best early-game combo. Full numbers, upgrade order, and timing breakdown in this post.", published: "2026-05-28T20:00:00Z", source_name: "r/NevernessToEverness" }, plan: { hook: "This cafe and auto shop combo prints Pixels while you sleep", content_type: "Guide", short_form: { platform: "TikTok / YouTube Shorts", duration: "40s", script_outline: ["Hook — 'make Pixels doing nothing'", "Show the business combo setup on screen", "Flash the daily income numbers", "CTA — like for more tycoon tips"] }, long_form: { title: "NTE City Tycoon Max Passive Income — Best Business Setup 2026", duration: "9-12 mins", sections: ["Intro — why passive income matters early game", "Best business combos ranked with exact numbers", "Step-by-step upgrade order walkthrough", "Daily reset routine for max Pixels", "Outro + CTA"] }, thumbnail_texts: ["MAX PIXEL INCOME GUIDE 💰", "PASSIVE MONEY IN NTE", "TYCOON TRICK NO ONE TALKS ABOUT"], hashtags: ["#NTE", "#NevernessToEverness", "#NTEtycoon", "#gachagaming", "#NTEguide"], urgency: "low", urgency_reason: "Evergreen content — works any time, no rush to publish." }, generated_at: "2026-05-29T09:01:00Z" },
+  { post: { title: "Beginner progression guide — what to prioritise your first two weeks", link: "#", summary: "Returning player who made every possible mistake on a fresh account. Wrote everything I wish I knew: which resources to hoard, which banners to skip, daily login priorities, and what to ignore early on. Covers weeks one and two in full detail.", published: "2026-05-28T14:45:00Z", source_name: "r/NevernessToEverness" }, plan: { hook: "New to NTE? Here are the mistakes that will waste your first two weeks", content_type: "Beginner Guide", short_form: { platform: "TikTok / YouTube Shorts", duration: "50s", script_outline: ["Hook — 'don't make these week 1 mistakes'", "List the 3 biggest early progression errors", "Show the correct priority order quickly", "CTA — save this before you start playing"] }, long_form: { title: "NTE Beginner Guide 2026 — What To Do In Your First 2 Weeks", duration: "12-15 mins", sections: ["Intro — why early decisions matter a lot in NTE", "Days 1-3: what to focus on immediately", "Week 1: resource management and daily habits", "Week 2: first banner decisions and team building", "Outro + what to watch next on the channel"] }, thumbnail_texts: ["BEGINNER GUIDE 2026 🎮", "DON'T MAKE THESE MISTAKES", "WEEK 1 NTE PROGRESSION GUIDE"], hashtags: ["#NTE", "#NevernessToEverness", "#NTEbeginner", "#gachagaming", "#NTEguide"], urgency: "medium", urgency_reason: "Evergreen but high search volume — good to publish any time, sooner is better." }, generated_at: "2026-05-29T09:02:00Z" }
+];
+
+let loading = false;
+let currentPlatform = 'reddit';
+
+function pickPlatform(btn) {
+  document.querySelectorAll('.platform-btn:not([disabled])').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPlatform = btn.dataset.platform;
+  loadFeed();
+}
+
+function refresh() { if (!loading) loadFeed(); }
+
+async function loadFeed() {
+  if (loading) return;
+  loading = true;
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('spinning');
+  document.getElementById('feed-meta').textContent = 'fetching guides...';
+  document.getElementById('feed-count').textContent = '—';
+
+  document.getElementById('feed').innerHTML = [1,2,3].map(() => `
+    <div class="skeleton">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div class="skel-line" style="width:52px"></div>
+        <div class="skel-line" style="width:90px"></div>
+        <div class="skel-line" style="width:110px"></div>
+      </div>
+      <div class="skel-line" style="width:72%;height:15px;margin-bottom:18px"></div>
+      <div class="skel-line"></div>
+      <div class="skel-line" style="width:92%"></div>
+      <div class="skel-line" style="width:68%"></div>
+    </div>`).join('');
+
+  await new Promise(r => setTimeout(r, 800));
+
+  let data = [], live = false;
+  try {
+    const res = await fetch(`/api/content?limit=6&platform=${currentPlatform}`);
+    if (res.ok) { const j = await res.json(); if (j.success && j.data?.length) { data = j.data; live = true; } }
+  } catch(e) {}
+  if (!data.length) data = MOCK;
+
+  document.getElementById('s-total').textContent = data.length;
+  document.getElementById('s-done').textContent  = data.length;
+  document.getElementById('s-queue').textContent = 0;
+  document.getElementById('feed-count').textContent = data.length;
+  document.getElementById('feed-meta').textContent =
+    `${data.length} guides · ${live ? 'live' : 'demo'} · ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+
+  if (!data.length) {
+    document.getElementById('feed').innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No guide posts found right now.<br><b>Try refreshing in a few minutes.</b></p></div>`;
+  } else {
+    document.getElementById('feed').innerHTML = data.map((item, i) => card(item, i)).join('');
+  }
+
+  btn.classList.remove('spinning');
+  loading = false;
+}
+
+function card(item, i) {
+  const { post, plan } = item;
+  const id = `c${i}`;
+  const ub = plan.urgency === 'high' ? `<span class="badge b-urg-h">⚡ high urgency</span>`
+           : plan.urgency === 'medium' ? `<span class="badge b-urg-m">● medium</span>`
+           : `<span class="badge b-urg-l">● low</span>`;
+  const ds = post.published ? new Date(post.published).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+  const wc = post.summary ? Math.round(post.summary.split(' ').length)+'w' : '';
+  const ss = (plan.short_form?.script_outline||[]).map((s,n)=>`<li><span class="step-n">${n+1}</span>${s}</li>`).join('');
+  const ls = (plan.long_form?.sections||[]).map((s,n)=>`<li><span class="step-n">${n+1}</span>${s}</li>`).join('');
+  const th = (plan.thumbnail_texts||[]).map(t=>`<div class="thumb-card"><p>${t}</p></div>`).join('');
+  const tg = (plan.hashtags||[]).map(h=>`<span class="hashtag" onclick="copyTag('${h}')">${h}</span>`).join('');
+  return `
+<div class="card" style="animation-delay:${i*90}ms" id="${id}">
+  <div class="card-top">
+    <div class="card-badges">
+      <span class="badge b-done">Done</span>
+      <span class="badge b-type">${plan.content_type||'Guide'}</span>
+      <span class="b-date">${ds}</span>
+      ${ub}
+    </div>
+    <div class="card-meta">${wc?`<span>${wc}</span>`:''}<span>${post.source_name||'Reddit'}</span></div>
+  </div>
+  <div class="card-title"><a href="${post.link}" target="_blank" rel="noopener">${post.title}</a></div>
+  <div class="card-tabs">
+    <button class="tab-btn active" onclick="tab('${id}','s',this)">Summary</button>
+    <button class="tab-btn" onclick="tab('${id}','p',this)">Content Plan</button>
+    <button class="tab-btn" onclick="tab('${id}','t',this)">Thumbnails</button>
+    <span class="tab-model">gemini-1.5-flash</span>
+  </div>
+  <div class="pane active" id="${id}-s">
+    ${plan.hook?`<div class="hook-line">${plan.hook}</div>`:''}
+    <div class="summary-box">
+      <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <p>${post.summary||'No summary available.'}</p>
+    </div>
+  </div>
+  <div class="pane" id="${id}-p">
+    <div class="plan-block">
+      <div class="plan-label"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>Short-form — ${plan.short_form?.platform||'TikTok / Shorts'} · ${plan.short_form?.duration||''}</div>
+      <ul class="step-list">${ss}</ul>
+    </div>
+    <div class="plan-block">
+      <div class="plan-label"><svg viewBox="0 0 24 24" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Long-form — YouTube · ${plan.long_form?.duration||''}</div>
+      ${plan.long_form?.title?`<div class="yt-title">${plan.long_form.title}</div>`:''}
+      <ul class="step-list">${ls}</ul>
+    </div>
+    ${plan.urgency_reason?`<div class="urg-note">⏱ ${plan.urgency_reason}</div>`:''}
+  </div>
+  <div class="pane" id="${id}-t">
+    <div class="thumb-grid">${th}</div>
+  </div>
+  <div class="hashtag-row">${tg}</div>
+</div>`;
+}
+
+function tab(id, pane, btn) {
+  document.querySelectorAll(`#${id} .tab-btn`).forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`#${id} .pane`).forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`${id}-${pane}`).classList.add('active');
+}
+
+let toastT;
+function copyTag(tag) {
+  navigator.clipboard.writeText(tag).catch(()=>{});
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = `Copied ${tag}`;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+loadFeed();
+</script>
+</body>
+</html>
