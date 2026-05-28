@@ -76,6 +76,8 @@ async function fetchRedditPosts(rssUrl, fetchLimit = 25) {
       const rawContent = get("content");
       const decoded = rawContent
         .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#\d+;/g, " ");
+      const imgMatch = decoded.match(/<img[^>]+src="([^"]+)"/);
+      const thumbnail = imgMatch ? imgMatch[1] : null;
       const content = decoded
         .replace(/<[^>]+>/g, " ")
         .replace(/&[a-z]+;/g, " ")
@@ -84,6 +86,7 @@ async function fetchRedditPosts(rssUrl, fetchLimit = 25) {
         title: get("title") || "No title",
         link: linkMatch ? linkMatch[1] : "#",
         summary: content,
+        thumbnail,
         published: get("updated"),
         author: get("name") || "Unknown",
       });
