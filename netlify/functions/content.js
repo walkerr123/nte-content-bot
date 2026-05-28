@@ -1,5 +1,4 @@
 const https = require("https");
-const xml = require("node:util").promisify; // unused, just using https directly
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
@@ -76,7 +75,7 @@ async function fetchRedditPosts(rssUrl, fetchLimit = 25) {
       const linkMatch = entry.match(/<link[^>]+href="([^"]+)"/);
       const content = get("content")
         .replace(/<[^>]+>/g, " ")
-        .replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&lt;/g, "").replace(/&gt;/g, "").replace(/&#\d+;/g, "")
         .replace(/\s+/g, " ").trim().slice(0, 600);
       posts.push({
         title: get("title") || "No title",
