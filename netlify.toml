@@ -1,0 +1,6 @@
+[build]
+  functions = "netlify/functions"
+
+[[functions]]
+  name = "nte-bot"
+  schedule = "*/30 * * * *"   # Every 30 minutes
