@@ -32,11 +32,13 @@
   </button>
 </nav>
 
-<div class="page">
-  <div class="main">
-  <div class="banner">
+<div class="banner">
+  <div class="banner-inner">
     <img src="banner.png" alt="banner" />
   </div>
+</div>
+
+<div class="page">
   <div class="eyebrow">Choose a source</div>
   <div class="platform-row">
     <button class="platform-btn active" data-platform="reddit" onclick="pickPlatform(this)">
@@ -68,10 +70,10 @@
     </div>
   </div>
 
-  </div>
-</div>
+  <div id="feed"></div>
 
-<div class="toast" id="toast">
+  </div>
+</div> id="toast">
   <svg viewBox="0 0 24 24" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
   <span id="toast-msg">Copied!</span>
 </div>
